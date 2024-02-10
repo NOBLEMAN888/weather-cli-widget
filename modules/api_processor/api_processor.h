@@ -4,17 +4,19 @@
 #include <iostream>
 #include <string>
 #include "nlohmann/json.hpp"
-
+#include <fstream>
+#include <cpr/cpr.h>
 using json = nlohmann::json;
 
 struct ConfigStructure {
   std::string city = "City";
   std::string period = "Period";
 };
-std::cout << ConfigStructure::city;
+
 json ReadConfigFile(std::string& path);
 
 std::string GenerateRequestAddress(json& options);
 
-//void MakeRequest
+json MakeRequest(std::string& address);
+
 #endif //LAB7_MODULES_API_PROCESSOR_API_PROCESSOR_H_

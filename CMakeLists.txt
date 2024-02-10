@@ -9,8 +9,8 @@ project(
 
 set(CMAKE_CXX_STANDARD 20)
 
-
-# Set a default build type if none was specified
+set(SOURCES main.cpp modules/api_processor/api_processor.cpp modules/event_listener/event_listener.cpp modules/output_processor/output_processor.cpp)
+set(HEADERS modules/api_processor/api_processor.h modules/event_listener/event_listener.h modules/output_processor/output_processor.h)
 
 set(DEFAULT_BUILD_TYPE "Release")
 if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
@@ -23,8 +23,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-include_directories(modules)
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 if(WIN32) # Install dlls in the same directory as the executable on Windows
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -41,7 +40,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE cpr::cpr)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 FetchContent_MakeAvailable(json)
 target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE api_processor)
-target_link_libraries(${PROJECT_NAME} PRIVATE event_listener)
-target_link_libraries(${PROJECT_NAME} PRIVATE output_processor)
+#
+#target_link_libraries(${PROJECT_NAME} PRIVATE api_processor)
+#target_link_libraries(${PROJECT_NAME} PRIVATE event_listener)
+#target_link_libraries(${PROJECT_NAME} PRIVATE output_processor)
