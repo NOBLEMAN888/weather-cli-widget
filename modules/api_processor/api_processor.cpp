@@ -1,14 +1,47 @@
 #include "api_processor.h"
 
-json MakeRequest(std::string& address) {
-//  "https://api.open-meteo.com/v1/forecast?latitude=90&longitude=30&hourly=temperature_2m&forecast_days=16"
+json ReadConfigFile(std::string path) {
+  std::ifstream f(path);
+  json data = json::parse(f);
+  return data;
+}
+void ReplaceAll(std::string& str, const std::string& from, const std::string& to) {
+  if (from.empty())
+    return;
+  size_t start_pos = 0;
+  while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+    str.replace(start_pos, from.length(), to);
+    start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+  }
+}
+
+std::string GenerateCityRequestAddress(std::string city) {
+  ReplaceAll(city, " ", "_");
+  std::string address = std::format("https://api.api-ninjas.com/v1/city?name={}", city);
+  return address;
+}
+
+std::string GenerateWeatherRequestAddress(WeatherRequestOptions options) {
+  std::string address = std::format(
+      "https://api.open-meteo.com/v1/forecast?latitude={}&longitude={}&current=temperature_2m,rain,showers,snowfall,weather_code,wind_speed_10m&hourly=temperature_2m,rain,showers,snowfall,weather_code,wind_speed_10m&forecast_days={}",
+      options.latitude,
+      options.longitude,
+      options.forecast_period);
+  return address;
+}
+
+json MakeCityRequest(std::string city) {
+  std::string address = GenerateCityRequestAddress(city);
   cpr::Response r = cpr::Get(cpr::Url{
-                                 address},
+                                 address}, cpr::Header{{"X-Api-Key", "1RpT8bbc4alF4U5B+AHofQ==r9ryDzr2ZjmOxwV6"}},
                              cpr::Authentication{"user", "pass", cpr::AuthMode::BASIC}, cpr::Timeout{1000});
   if (r.elapsed > 1) {
-    std::cout << "Too long to wait!";
+    std::cerr << std::format("The response waiting time has been exceeded for the city: {}", city);
   }
-  std::cout << "Status code: " << r.status_code << '\n';
+  if (r.status_code != 200){
+    std::cout << std::format("Failed to make request for the city: {}", city);
+  }
+//  std::cout << "Status code: " << r.status_code << '\n';
   json::parser_callback_t cb = [](int depth, json::parse_event_t event, json& parsed) {
     if (event == json::parse_event_t::key and parsed == json("Thumbnail")) {
       return false;
@@ -20,12 +53,26 @@ json MakeRequest(std::string& address) {
   return j_filtered;
 }
 
-json ReadConfigFile(std::string& path) {
-  std::ifstream f(path);
-  json data = json::parse(f);
-  return data;
-}
-
-std::string GenerateRequestAddress(json& options) {
-  return std::string();
+json MakeWeatherRequest(WeatherRequestOptions options) {
+  std::string address = GenerateWeatherRequestAddress(options);
+//  "https://api.open-meteo.com/v1/forecast?latitude=90&longitude=30&hourly=temperature_2m&forecast_days=16"
+  cpr::Response r = cpr::Get(cpr::Url{
+                                 address},
+                             cpr::Authentication{"user", "pass", cpr::AuthMode::BASIC}, cpr::Timeout{1000});
+  if (r.elapsed > 1) {
+    std::cerr << std::format("The response waiting time has been exceeded for the city: {}", options.name);
+  }
+  if (r.status_code != 200){
+    std::cout << std::format("Failed to make request for the city: {}", options.name);
+  }
+//  std::cout << "Status code: " << r.status_code << '\n';
+  json::parser_callback_t cb = [](int depth, json::parse_event_t event, json& parsed) {
+    if (event == json::parse_event_t::key and parsed == json("Thumbnail")) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+  json j_filtered = json::parse(r.text, cb);
+  return j_filtered;
 }

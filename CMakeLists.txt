@@ -9,8 +9,8 @@ project(
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(SOURCES main.cpp modules/api_processor/api_processor.cpp modules/event_listener/event_listener.cpp modules/output_processor/output_processor.cpp)
-set(HEADERS modules/api_processor/api_processor.h modules/event_listener/event_listener.h modules/output_processor/output_processor.h)
+set(SOURCES main.cpp modules/api_processor/api_processor.cpp modules/event_listener/event_listener.cpp modules/output_processor/output_processor.cpp modules/weather_app/weather_app.cpp)
+set(HEADERS modules/api_processor/api_processor.h modules/event_listener/event_listener.h modules/output_processor/output_processor.h modules/weather_app/weather_app.h)
 
 set(DEFAULT_BUILD_TYPE "Release")
 if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
@@ -40,7 +40,3 @@ target_link_libraries(${PROJECT_NAME} PRIVATE cpr::cpr)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 FetchContent_MakeAvailable(json)
 target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
-#
-#target_link_libraries(${PROJECT_NAME} PRIVATE api_processor)
-#target_link_libraries(${PROJECT_NAME} PRIVATE event_listener)
-#target_link_libraries(${PROJECT_NAME} PRIVATE output_processor)

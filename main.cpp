@@ -1,13 +1,9 @@
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <cpr/cpr.h>
-#include "nlohmann/json.hpp"
-#include "modules/api_processor/api_processor.h"
-
-using json = nlohmann::json;
+#include "modules/weather_app/weather_app.h"
 
 int main(int argc, char** argv) {
+  std::string path = "../config.json";
+  GetWeather(path);
 
 //  std::cout << data["City1"] << '\n';
 //  cpr::Parameters{{"latitude", "90"}, {"longitude", "30"}, {"hourly", "temperature_2m"}, {"forecast_days", "16"}}
