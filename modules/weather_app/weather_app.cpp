@@ -1,6 +1,6 @@
 #include "weather_app.h"
 
-std::vector<WeatherRequestOptions> GetWeatherRequestOptions(json config){
+std::vector<WeatherRequestOptions> GetWeatherRequestOptions(json config) {
   ConfigStructure config_structure;
   CityRequestStructure city_request_structure;
   std::vector<WeatherRequestOptions> cities_info;
@@ -24,13 +24,33 @@ void GetWeather(std::string path) {
   json config = ReadConfigFile(path);
   std::vector<WeatherRequestOptions> cities_info = GetWeatherRequestOptions(config);
   json request;
-  for (WeatherRequestOptions city : cities_info){
-    request = MakeWeatherRequest(city);
-    std::cout << city.name << ' ';
-    std::cout << round(int(request["current"]["temperature_2m"])) << ' ';
-    for (int i = 3; i < 22; i += 6){
-      std::cout << round(int(request["hourly"]["temperature_2m"][i])) << ' ';
+  size_t current_city_index = 0;
+
+  request = MakeWeatherRequest(cities_info[current_city_index]);
+  PrintWeather(cities_info[current_city_index], request);
+  std::cout << '\n';
+  bool pressed = false;
+  while(!ListenKeyPressed(VK_ESCAPE)) {
+    if (ListenKeyPressed('N')){
+      pressed = true;
+//      if (current_city_index < cities_info.size() - 1) {
+//        ++current_city_index;
+//        request = MakeWeatherRequest(cities_info[current_city_index]);
+//        PrintWeather(cities_info[current_city_index], request);
+//        std::cout << '\n';
+//      }
+    } else if (ListenKeyPressed('P')) {
+      if (current_city_index > 0) {
+        --current_city_index;
+        request = MakeWeatherRequest(cities_info[current_city_index]);
+        PrintWeather(cities_info[current_city_index], request);
+        std::cout << '\n';
+      }
+    } else if (ListenKeyPressed('+')) {
+      std::cout << "More days!";
+    } else if (ListenKeyPressed('-')) {
+      std::cout << "Less days!";
     }
-    std::cout << '\n';
   }
+  std::cout << "May your day be sunny! See you later...";
 }

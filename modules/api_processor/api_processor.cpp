@@ -2,8 +2,13 @@
 
 json ReadConfigFile(std::string path) {
   std::ifstream f(path);
-  json data = json::parse(f);
-  return data;
+  if (f.is_open()){
+    json data = json::parse(f);
+    return data;
+  } else {
+    std::cerr << "Failed to open config file!";
+    exit(1);
+  }
 }
 void ReplaceAll(std::string& str, const std::string& from, const std::string& to) {
   if (from.empty())
@@ -23,7 +28,7 @@ std::string GenerateCityRequestAddress(std::string city) {
 
 std::string GenerateWeatherRequestAddress(WeatherRequestOptions options) {
   std::string address = std::format(
-      "https://api.open-meteo.com/v1/forecast?latitude={}&longitude={}&current=temperature_2m,rain,showers,snowfall,weather_code,wind_speed_10m&hourly=temperature_2m,rain,showers,snowfall,weather_code,wind_speed_10m&forecast_days={}",
+      "https://api.open-meteo.com/v1/forecast?latitude={}&longitude={}&current=temperature_2m,apparent_temperature,rain,showers,snowfall,weather_code,wind_speed_10m&hourly=temperature_2m,apparent_temperature,rain,showers,snowfall,weather_code,wind_speed_10m&timezone=auto&forecast_days={}",
       options.latitude,
       options.longitude,
       options.forecast_period);
@@ -41,7 +46,6 @@ json MakeCityRequest(std::string city) {
   if (r.status_code != 200){
     std::cout << std::format("Failed to make request for the city: {}", city);
   }
-//  std::cout << "Status code: " << r.status_code << '\n';
   json::parser_callback_t cb = [](int depth, json::parse_event_t event, json& parsed) {
     if (event == json::parse_event_t::key and parsed == json("Thumbnail")) {
       return false;
@@ -55,7 +59,6 @@ json MakeCityRequest(std::string city) {
 
 json MakeWeatherRequest(WeatherRequestOptions options) {
   std::string address = GenerateWeatherRequestAddress(options);
-//  "https://api.open-meteo.com/v1/forecast?latitude=90&longitude=30&hourly=temperature_2m&forecast_days=16"
   cpr::Response r = cpr::Get(cpr::Url{
                                  address},
                              cpr::Authentication{"user", "pass", cpr::AuthMode::BASIC}, cpr::Timeout{1000});

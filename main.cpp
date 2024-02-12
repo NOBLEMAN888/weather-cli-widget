@@ -1,9 +1,9 @@
-#include <iostream>
 #include "modules/weather_app/weather_app.h"
 
-int main(int argc, char** argv) {
+int main() {
   std::string path = "../config.json";
   GetWeather(path);
+//  system("cls");
 
 //  std::cout << data["City1"] << '\n';
 //  cpr::Parameters{{"latitude", "90"}, {"longitude", "30"}, {"hourly", "temperature_2m"}, {"forecast_days", "16"}}

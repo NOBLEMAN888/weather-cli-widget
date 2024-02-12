@@ -1,11 +1,12 @@
 #ifndef LAB7_MODULES_API_PROCESSOR_API_PROCESSOR_H_
 #define LAB7_MODULES_API_PROCESSOR_API_PROCESSOR_H_
 
-#include <iostream>
-#include <string>
+#include "cpr/cpr.h"
 #include "nlohmann/json.hpp"
+
+#include <string>
 #include <fstream>
-#include <cpr/cpr.h>
+#include <iostream>
 
 using json = nlohmann::json;
 
