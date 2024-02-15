@@ -11,8 +11,6 @@
 
 using json = nlohmann::json;
 
-void PrintCertainHourWeather(json request, size_t index);
-
 void PrintWeather(WeatherRequestOptions city, json request);
 
 #endif //LAB7_MODULES_OUTPUT_PROCESSOR_OUTPUT_PROCESSOR_H_

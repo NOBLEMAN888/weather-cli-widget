@@ -35,10 +35,10 @@ std::string GenerateWeatherRequestAddress(WeatherRequestOptions options) {
   return address;
 }
 
-json MakeCityRequest(std::string city) {
+json MakeCityRequest(std::string city, std::string api_key) {
   std::string address = GenerateCityRequestAddress(city);
   cpr::Response r = cpr::Get(cpr::Url{
-                                 address}, cpr::Header{{"X-Api-Key", "1RpT8bbc4alF4U5B+AHofQ==r9ryDzr2ZjmOxwV6"}},
+                                 address}, cpr::Header{{"X-Api-Key", api_key}},
                              cpr::Authentication{"user", "pass", cpr::AuthMode::BASIC}, cpr::Timeout{1000});
   if (r.elapsed > 1) {
     std::cerr << std::format("The response waiting time has been exceeded for the city: {}", city);

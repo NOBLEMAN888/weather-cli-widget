@@ -7,7 +7,7 @@ std::vector<WeatherRequestOptions> GetWeatherRequestOptions(json config) {
   json request;
   for (std::string city : config[config_structure.list_of_cities]) {
     if (!city.empty()) {
-      request = MakeCityRequest(city);
+      request = MakeCityRequest(city, config[config_structure.api_key]);
       if (request.empty()) {
         std::cerr << std::format("Failed to get info about the city: {} \n", city);
       } else {
@@ -22,23 +22,31 @@ std::vector<WeatherRequestOptions> GetWeatherRequestOptions(json config) {
 }
 void GetWeather(std::string path) {
   json config = ReadConfigFile(path);
+  ConfigStructure config_structure;
   std::vector<WeatherRequestOptions> cities_info = GetWeatherRequestOptions(config);
   json request;
   size_t current_city_index = 0;
 
+  time_t last_time = time(nullptr);
   request = MakeWeatherRequest(cities_info[current_city_index]);
   PrintWeather(cities_info[current_city_index], request);
-  std::cout << '\n';
+
   bool pressed = false;
   while(!ListenKeyPressed(VK_ESCAPE)) {
+    if (time(nullptr) - last_time >= config[config_structure.updating_frequency]){
+      std::cout << "UPDATING!!!";
+      last_time = time(nullptr);
+      request = MakeWeatherRequest(cities_info[current_city_index]);
+      PrintWeather(cities_info[current_city_index], request);
+    }
     if (ListenKeyPressed('N')){
       pressed = true;
-//      if (current_city_index < cities_info.size() - 1) {
-//        ++current_city_index;
-//        request = MakeWeatherRequest(cities_info[current_city_index]);
-//        PrintWeather(cities_info[current_city_index], request);
-//        std::cout << '\n';
-//      }
+      if (current_city_index < cities_info.size() - 1) {
+        ++current_city_index;
+        request = MakeWeatherRequest(cities_info[current_city_index]);
+        PrintWeather(cities_info[current_city_index], request);
+        std::cout << '\n';
+      }
     } else if (ListenKeyPressed('P')) {
       if (current_city_index > 0) {
         --current_city_index;

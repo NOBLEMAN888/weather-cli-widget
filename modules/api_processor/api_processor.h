@@ -11,6 +11,7 @@
 using json = nlohmann::json;
 
 struct ConfigStructure {
+  std::string api_key = "api_key";
   std::string list_of_cities = "list_of_cities";
   std::string forecast_period = "forecast_period";
   std::string updating_frequency = "updating_frequency";
@@ -43,7 +44,7 @@ std::string GenerateCityRequestAddress(std::string city);
 
 std::string GenerateWeatherRequestAddress(WeatherRequestOptions options);
 
-json MakeCityRequest(std::string city);
+json MakeCityRequest(std::string city, std::string api_key);
 
 json MakeWeatherRequest(WeatherRequestOptions options);
 #endif //LAB7_MODULES_API_PROCESSOR_API_PROCESSOR_H_
