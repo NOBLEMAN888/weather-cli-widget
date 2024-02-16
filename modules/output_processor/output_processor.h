@@ -11,6 +11,10 @@
 
 using json = nlohmann::json;
 
+std::string GetWeatherByCode(int code);
+
+std::string GetWindDir(int degrees);
+
 void PrintWeather(WeatherRequestOptions city, json request);
 
 #endif //LAB7_MODULES_OUTPUT_PROCESSOR_OUTPUT_PROCESSOR_H_

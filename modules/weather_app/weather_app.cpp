@@ -27,37 +27,46 @@ void GetWeather(std::string path) {
   json request;
   size_t current_city_index = 0;
 
-  time_t last_time = time(nullptr);
   request = MakeWeatherRequest(cities_info[current_city_index]);
   PrintWeather(cities_info[current_city_index], request);
-
-  bool pressed = false;
+  time_t update_timer = time(nullptr);
+  time_t button_timer = clock();
   while(!ListenKeyPressed(VK_ESCAPE)) {
-    if (time(nullptr) - last_time >= config[config_structure.updating_frequency]){
-      std::cout << "UPDATING!!!";
-      last_time = time(nullptr);
+    if (time(nullptr) - update_timer >= config[config_structure.updating_frequency]){
       request = MakeWeatherRequest(cities_info[current_city_index]);
       PrintWeather(cities_info[current_city_index], request);
+      update_timer = time(nullptr);
     }
-    if (ListenKeyPressed('N')){
-      pressed = true;
+    if (ListenKeyPressed('N') && clock() - button_timer >= 200){
+      button_timer = clock();
       if (current_city_index < cities_info.size() - 1) {
         ++current_city_index;
         request = MakeWeatherRequest(cities_info[current_city_index]);
         PrintWeather(cities_info[current_city_index], request);
-        std::cout << '\n';
+        update_timer = time(nullptr);
       }
-    } else if (ListenKeyPressed('P')) {
+    } else if (ListenKeyPressed('P') && clock() - button_timer >= 200) {
+      button_timer = clock();
       if (current_city_index > 0) {
         --current_city_index;
         request = MakeWeatherRequest(cities_info[current_city_index]);
         PrintWeather(cities_info[current_city_index], request);
-        std::cout << '\n';
+        update_timer = time(nullptr);
       }
-    } else if (ListenKeyPressed('+')) {
-      std::cout << "More days!";
-    } else if (ListenKeyPressed('-')) {
-      std::cout << "Less days!";
+    } else if (ListenKeyPressed(VK_OEM_PLUS) && clock() - button_timer >= 200) {
+      button_timer = clock();
+      ++cities_info[current_city_index].forecast_period;
+      request = MakeWeatherRequest(cities_info[current_city_index]);
+      PrintWeather(cities_info[current_city_index], request);
+      update_timer = time(nullptr);
+    } else if (ListenKeyPressed(VK_OEM_MINUS) && clock() - button_timer >= 200) {
+      button_timer = clock();
+      if (cities_info[current_city_index].forecast_period > 1) {
+        --cities_info[current_city_index].forecast_period;
+        request = MakeWeatherRequest(cities_info[current_city_index]);
+        PrintWeather(cities_info[current_city_index], request);
+        update_timer = time(nullptr);
+      }
     }
   }
   std::cout << "May your day be sunny! See you later...";
