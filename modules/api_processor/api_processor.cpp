@@ -2,11 +2,17 @@
 
 json ReadConfigFile(std::string path) {
   std::ifstream f(path);
-  if (f.is_open()){
-    json data = json::parse(f);
-    return data;
+  if (f.is_open()) {
+    try {
+      json data = json::parse(f);
+      return data;
+    }
+    catch (const json::parse_error& err) {
+      std::cerr << "Failed to parse config file! Check config validity!\n";
+      exit(1);
+    }
   } else {
-    std::cerr << "Failed to open config file!";
+    std::cerr << "Failed to open config file!\n";
     exit(1);
   }
 }
@@ -39,12 +45,14 @@ json MakeCityRequest(std::string city, std::string api_key) {
   std::string address = GenerateCityRequestAddress(city);
   cpr::Response r = cpr::Get(cpr::Url{
                                  address}, cpr::Header{{"X-Api-Key", api_key}},
-                             cpr::Authentication{"user", "pass", cpr::AuthMode::BASIC}, cpr::Timeout{1000});
-  if (r.elapsed > 1) {
-    std::cerr << std::format("The response waiting time has been exceeded for the city: {}", city);
+                             cpr::Authentication{"user", "pass", cpr::AuthMode::BASIC}, cpr::Timeout{10000});
+  if (r.status_code != 200) {
+    std::cout << std::format("Waiting for response to the api-request for the city: {}\n", city);
   }
-  if (r.status_code != 200){
-    std::cout << std::format("Failed to make request for the city: {}", city);
+  while (r.status_code != 200) {
+    r = cpr::Get(cpr::Url{
+                     address}, cpr::Header{{"X-Api-Key", api_key}},
+                 cpr::Authentication{"user", "pass", cpr::AuthMode::BASIC}, cpr::Timeout{10000});
   }
   json::parser_callback_t cb = [](int depth, json::parse_event_t event, json& parsed) {
     if (event == json::parse_event_t::key and parsed == json("Thumbnail")) {
@@ -53,22 +61,29 @@ json MakeCityRequest(std::string city, std::string api_key) {
       return true;
     }
   };
-  json j_filtered = json::parse(r.text, cb);
-  return j_filtered;
+  try {
+    json j_filtered = json::parse(r.text, cb);
+    return j_filtered;
+  }
+  catch (const json::parse_error& err) {
+    std::cerr << "Failed to parse api-response! Making another request...\n";
+    return MakeCityRequest(city, api_key);
+  }
 }
 
 json MakeWeatherRequest(WeatherRequestOptions options) {
   std::string address = GenerateWeatherRequestAddress(options);
   cpr::Response r = cpr::Get(cpr::Url{
                                  address},
-                             cpr::Authentication{"user", "pass", cpr::AuthMode::BASIC}, cpr::Timeout{1000});
-  if (r.elapsed > 1) {
-    std::cerr << std::format("The response waiting time has been exceeded for the city: {}", options.name);
+                             cpr::Authentication{"user", "pass", cpr::AuthMode::BASIC}, cpr::Timeout{10000});
+  if (r.status_code != 200) {
+    std::cout << std::format("Waiting for response to the api-request for the city: {}\n", options.name);
   }
-  if (r.status_code != 200){
-    std::cout << std::format("Failed to make request for the city: {}", options.name);
+  while (r.status_code != 200) {
+    r = cpr::Get(cpr::Url{
+                     address},
+                 cpr::Authentication{"user", "pass", cpr::AuthMode::BASIC}, cpr::Timeout{10000});
   }
-//  std::cout << "Status code: " << r.status_code << '\n';
   json::parser_callback_t cb = [](int depth, json::parse_event_t event, json& parsed) {
     if (event == json::parse_event_t::key and parsed == json("Thumbnail")) {
       return false;
@@ -76,6 +91,12 @@ json MakeWeatherRequest(WeatherRequestOptions options) {
       return true;
     }
   };
-  json j_filtered = json::parse(r.text, cb);
-  return j_filtered;
+  try {
+    json j_filtered = json::parse(r.text, cb);
+    return j_filtered;
+  }
+  catch (const json::parse_error& err) {
+    std::cerr << "Failed to parse api-response! Making another request...\n";
+    return MakeWeatherRequest(options);
+  }
 }
