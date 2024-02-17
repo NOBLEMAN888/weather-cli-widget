@@ -31,7 +31,6 @@ struct WeatherRequestOptions {
   double latitude;
   double longitude;
   size_t forecast_period;
-//  ? size_t last_time_updated;
   WeatherRequestOptions(std::string name, double latitude, double longitude, size_t forecast_period) :
       name{name}, latitude{latitude}, longitude{longitude}, forecast_period{forecast_period} {};
 };

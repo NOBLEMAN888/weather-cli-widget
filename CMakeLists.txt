@@ -19,13 +19,12 @@ endif()
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to '${DEFAULT_BUILD_TYPE}' as none was specified.")
     set(CMAKE_BUILD_TYPE "${DEFAULT_BUILD_TYPE}" CACHE STRING "Choose the type of build." FORCE)
-    # Set the possible values of build type for cmake-gui
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
-if(WIN32) # Install dlls in the same directory as the executable on Windows
+if(WIN32)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 endif()
@@ -33,7 +32,7 @@ endif()
 include(FetchContent)
 
 FetchContent_Declare(cpr GIT_REPOSITORY https://github.com/libcpr/cpr.git
-        GIT_TAG 3b15fa82ea74739b574d705fea44959b58142eb8) # The commit hash for 1.10.x. Replace with the latest from: https://github.com/libcpr/cpr/releases
+        GIT_TAG 3b15fa82ea74739b574d705fea44959b58142eb8)
 FetchContent_MakeAvailable(cpr)
 target_link_libraries(${PROJECT_NAME} PRIVATE cpr::cpr)
 

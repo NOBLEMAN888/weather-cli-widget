@@ -14,13 +14,6 @@
 
 using json = nlohmann::json;
 
-//struct WeatherInfo {
-//  std::string day_time;
-//  std::string weather_state;
-//  size_t temperature;
-//  size_t apparent_temperature;
-//
-//};
 std::vector<WeatherRequestOptions> GetWeatherRequestOptions(json config);
 
 void GetWeather(std::string path);
