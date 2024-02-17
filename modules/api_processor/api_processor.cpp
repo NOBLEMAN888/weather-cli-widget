@@ -50,6 +50,10 @@ json MakeCityRequest(std::string city, std::string api_key) {
     std::cout << std::format("Waiting for response to the api-request for the city: {}\n", city);
   }
   while (r.status_code != 200) {
+    if (GetKeyState(VK_ESCAPE) & 0x8000){
+      std::cout << "May your day be sunny! See you later...";
+      exit(0);
+    }
     r = cpr::Get(cpr::Url{
                      address}, cpr::Header{{"X-Api-Key", api_key}},
                  cpr::Authentication{"user", "pass", cpr::AuthMode::BASIC}, cpr::Timeout{10000});
@@ -80,6 +84,10 @@ json MakeWeatherRequest(WeatherRequestOptions options) {
     std::cout << std::format("Waiting for response to the api-request for the city: {}\n", options.name);
   }
   while (r.status_code != 200) {
+    if (GetKeyState(VK_ESCAPE) & 0x8000){
+      std::cout << "May your day be sunny! See you later...";
+      exit(0);
+    }
     r = cpr::Get(cpr::Url{
                      address},
                  cpr::Authentication{"user", "pass", cpr::AuthMode::BASIC}, cpr::Timeout{10000});
