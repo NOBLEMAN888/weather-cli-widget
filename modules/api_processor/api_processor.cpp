@@ -5,10 +5,12 @@ json ReadConfigFile(std::string path) {
   if (f.is_open()) {
     try {
       json data = json::parse(f);
+      f.close();
       return data;
     }
     catch (const json::parse_error& err) {
       std::cerr << "Failed to parse config file! Check config validity!\n";
+      f.close();
       exit(1);
     }
   } else {
