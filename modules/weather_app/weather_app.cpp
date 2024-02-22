@@ -55,10 +55,12 @@ void GetWeather(std::string path) {
       }
     } else if (ListenKeyPressed(VK_OEM_PLUS) && clock() - button_timer >= 200) {
       button_timer = clock();
-      ++cities_info[current_city_index].forecast_period;
-      request = MakeWeatherRequest(cities_info[current_city_index]);
-      PrintWeather(cities_info[current_city_index], request);
-      update_timer = time(nullptr);
+      if (cities_info[current_city_index].forecast_period < 16) {
+        ++cities_info[current_city_index].forecast_period;
+        request = MakeWeatherRequest(cities_info[current_city_index]);
+        PrintWeather(cities_info[current_city_index], request);
+        update_timer = time(nullptr);
+      }
     } else if (ListenKeyPressed(VK_OEM_MINUS) && clock() - button_timer >= 200) {
       button_timer = clock();
       if (cities_info[current_city_index].forecast_period > 1) {
