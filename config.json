@@ -1,0 +1,10 @@
+{
+  "api_key": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "list_of_cities": [
+    "Saint Petersburg",
+    "Moscow",
+    "New York"
+  ],
+  "forecast_period": 2,
+  "updating_frequency": 10000
+}
